@@ -46,28 +46,47 @@ function renderItems(){
 
 /* Drag & drop handlers */
 function bindDrag(el){
+  /* --- Desktop native drag --- */
   el.addEventListener('dragstart', e=>{
+    // prevent accidental image ghost drag on touch devices
+    try { e.dataTransfer.setData("text/plain", el.dataset.id); } catch(err){}
     el.classList.add("dragging");
-    e.dataTransfer.setData("text/plain", el.dataset.id);
   });
   el.addEventListener('dragend', ()=> el.classList.remove("dragging"));
 
-  /* Touch fallback */
-  let pointerDown=false, startX=0, startY=0;
+  /* --- Pointer fallback for touch / mouse (more reliable) --- */
+  let pointerDown=false, startX=0, startY=0, lastDx=0, lastDy=0;
+  // pointerdown
   el.addEventListener('pointerdown', e=>{
-    pointerDown=true; startX=e.clientX; startY=e.clientY;
-    el.setPointerCapture(e.pointerId);
-    el.style.position='relative'; el.style.zIndex = 100;
+    // prevent native dragstart and text selection
+    e.preventDefault();
+    pointerDown=true;
+    startX=e.clientX;
+    startY=e.clientY;
+    lastDx = 0; lastDy = 0;
+    // capture pointer so we continue to receive events even if pointer leaves element
+    try { el.setPointerCapture(e.pointerId); } catch(err){}
+    // styling for dragging
+    el.style.position='relative';
+    el.style.zIndex = 1000;
+    el.classList.add('dragging');
   });
+
+  // pointermove
   el.addEventListener('pointermove', e=>{
     if(!pointerDown) return;
-    const dx = e.clientX - startX, dy = e.clientY - startY;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    lastDx = dx; lastDy = dy;
+    // use transform to move visually (fast)
     el.style.transform = `translate(${dx}px,${dy}px)`;
   });
-  el.addEventListener('pointerup', e=>{
+
+  // pointerup / pointercancel
+  const endPointer = (e) => {
     if(!pointerDown) return;
     pointerDown=false;
-    el.style.transform=''; el.style.position='static'; el.style.zIndex='';
+    // compute collision WHILE transform still applied (so rect reflects actual visual pos)
     const rect = el.getBoundingClientRect();
     const centerX = rect.left + rect.width/2;
     const centerY = rect.top + rect.height/2;
@@ -78,13 +97,30 @@ function bindDrag(el){
         droppedBin = bin;
       }
     });
-    if(droppedBin) handleDrop(el.dataset.id, droppedBin);
-  });
+
+    // release pointer capture if available
+    try { if(e && e.pointerId) el.releasePointerCapture(e.pointerId); } catch(err){}
+
+    // reset visual styles AFTER computing rect
+    el.style.transform='';
+    el.style.position='static';
+    el.style.zIndex='';
+    el.classList.remove('dragging');
+
+    if(droppedBin){
+      handleDrop(el.dataset.id, droppedBin);
+    } else {
+      // no drop -> just snap back (we already reset transform)
+    }
+  };
+
+  el.addEventListener('pointerup', endPointer);
+  el.addEventListener('pointercancel', endPointer);
 }
 
-/* Desktop drag & drop */
+/* Desktop drag & drop (bins) */
 bins.forEach(bin=>{
-  bin.addEventListener('dragover', e=>{ e.preventDefault(); bin.classList.add("highlight") });
+  bin.addEventListener('dragover', e=>{ e.preventDefault(); bin.classList.add("highlight"); });
   bin.addEventListener('dragleave', ()=> bin.classList.remove("highlight"));
   bin.addEventListener('drop', e=>{
     e.preventDefault();
@@ -109,19 +145,17 @@ function handleDrop(id, bin){
     popupText.innerText = `${item.name} is ${bin.textContent}. +100 điểm!`;
     popup.style.display='block';
 
-    // Remove item from remaining and render
     remaining.splice(itemIndex,1);
     renderItems();
-
-    // ✅ Redirect to final.html if all items sorted
-    if (remaining.length === 0) {
-      setTimeout(() => {
-        window.location.href = "final.html";
-      }, 500); // 0.5 second delay for popup
-    }
-
   } else {
-    bin.animate([{background:'#fff'},{background:'#ffdcdc'},{background:'#fff'}],{duration:400});
+    // visual feedback for wrong bin
+    if (bin.animate) {
+      bin.animate([{background:'#fff'},{background:'#ffdcdc'},{background:'#fff'}],{duration:400});
+    } else {
+      // fallback: briefly add a class (if CSS exists)
+      bin.classList.add('wrong');
+      setTimeout(()=>bin.classList.remove('wrong'), 400);
+    }
   }
 }
 
