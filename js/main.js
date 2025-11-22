@@ -11,6 +11,7 @@ if (localStorage.getItem("saola_arcade_played") === "yes") {
 } else {
     // First-time player → start Sorting Game
     btn.addEventListener("click", () => {
-        window.location.href = "sorting-game.html";
+        window.location.href = "info.html";
     });
 }
+
