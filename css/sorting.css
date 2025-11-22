@@ -114,6 +114,25 @@ h1 {
   text-align: center;
 }
 
+.end-popup {
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.6);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 999;
+}
+
+.end-popup-box {
+background: white;
+padding: 20px 30px;
+border-radius: 10px;
+width: 350px;
+text-align: center;
+}
+
+
 @media(max-width:720px){
   #board {
     flex-direction: column;
@@ -123,3 +142,4 @@ h1 {
     width: 100%;
   }
 }
+
