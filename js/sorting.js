@@ -170,38 +170,13 @@ document.getElementById("popupClose").addEventListener("click", () => {
   popup.style.display = 'none';
 });
 
-/*RESET GAME*/
-function resetGame() {
-endPopup.style.display = "none";
-playerNameInput.value = "";
-playerMessageInput.value = "";
-score = 0;
-localStorage.setItem("saola_arcade_score", "0");
-scoreEl.innerText = score;
-remaining = shuffle(ITEMS.slice());
-renderItems();
-}
-
-/* end popup*/
- function showEndPopup() {
-endPopup.style.display = "flex";
-}
-  endPopup.innerHTML = `
-    <div class="popup-content">
-      <h2>Cảm ơn bạn, ${name}!</h2>
-      <p>Điểm của bạn: ${score}</p>
-      <p>Thông điệp của bạn:</p>
-      <blockquote>${message}</blockquote>
-      <button id="btnPlayAgain2">Chơi lại</button>
-    </div>
-  `;
-
 /* INIT */
 function init(){
   remaining = shuffle(ITEMS.slice());
   renderItems();
 }
 init();
+
 
 
 
