@@ -17,6 +17,12 @@ const scoreEl = document.getElementById("score");
 const popup = document.getElementById("popup");
 const popupText = document.getElementById("popupText");
 const popupImg = document.getElementById("popupImg");
+const endPopup = document.getElementById("endPopup");
+const endForm  = document.getElementById("endForm");
+const playAgainBtn = document.getElementById("playAgainBtn");
+const playerNameInput = document.getElementById("playerName");
+const playerMessageInput = document.getElementById("playerMessage");
+
 
 scoreEl.innerText = score;
 
@@ -181,5 +187,6 @@ function init(){
   renderItems();
 }
 init();
+
 
 
