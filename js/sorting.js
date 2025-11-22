@@ -164,15 +164,10 @@ document.getElementById("popupClose").addEventListener("click", () => {
   popup.style.display = 'none';
 });
 
-/* Reset session */
-document.getElementById("resetBtn").addEventListener("click", ()=>{
-  localStorage.setItem("saola_arcade_score","0");
-  score = 0; scoreEl.innerText = 0;
-});
-
 /* INIT */
 function init(){
   remaining = shuffle(ITEMS.slice());
   renderItems();
 }
 init();
+
