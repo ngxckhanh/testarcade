@@ -39,26 +39,34 @@
 
   <!-- Link external JS -->
   <script src="js/sorting.js"></script>
+  <!-- POPUP CUỐI GAME -->
+
+<div id="endPopup" class="end-popup" style="display:none;">
+  <div class="end-popup-box">
+    <h2>🎉 Bạn đã hoàn thành trò chơi!</h2>
+    
+<form id="endForm">
+  <label>
+    Tên của bạn:<br>
+    <input type="text" id="playerName" required>
+  </label><br><br>
+
+  <label>
+    Bạn muốn gửi thông điệp gì?<br>
+    <textarea id="playerMessage" rows="4" required></textarea>
+  </label><br><br>
+
+  <button type="submit">Gửi</button>
+  <button type="button" id="playAgainBtn">Chơi lại</button>
+</form>
+
+  </div>
+</div>
+
 </body>
 </html>
 
-<!-- Popup cuối -->
-<div id="endPopup" class="popup end-popup" style="display: none;">
-  <div class="popup-content">
-    <h2>Chúc mừng bạn đã hoàn thành!</h2>
-    <form id="endForm">
-      <label>
-        Tên của bạn:<br>
-        <input type="text" id="playerName" required>
-      </label><br><br>
-      <label>
-        Thông điệp của bạn:<br>
-        <textarea id="playerMessage" rows="4" required></textarea>
-      </label><br><br>
-      <button type="submit">Xác nhận</button>
-      <button type="button" id="btnPlayAgain">Chơi lại</button>
-    </form>
-  </div>
-</div>
+
+
 
 
