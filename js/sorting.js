@@ -164,10 +164,22 @@ document.getElementById("popupClose").addEventListener("click", () => {
   popup.style.display = 'none';
 });
 
+/* end popup*/
+  endPopup.innerHTML = `
+    <div class="popup-content">
+      <h2>Cảm ơn bạn, ${name}!</h2>
+      <p>Điểm của bạn: ${score}</p>
+      <p>Thông điệp của bạn:</p>
+      <blockquote>${message}</blockquote>
+      <button id="btnPlayAgain2">Chơi lại</button>
+    </div>
+  `;
+
 /* INIT */
 function init(){
   remaining = shuffle(ITEMS.slice());
   renderItems();
 }
 init();
+
 
