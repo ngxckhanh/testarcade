@@ -1,183 +1,108 @@
-/* DATA: list of items and their categories */
+/* QUIZ ITEMS */
 const ITEMS = [
-  {id:1,name:"Vỏ chuối",cat:"organic"},
-  {id:2,name:"Lon nhôm",cat:"recycle"},
-  {id:3,name:"Túi ni lông",cat:"inorganic"},
-  {id:4,name:"Chai nhựa",cat:"recycle"},
-  {id:5,name:"Thức ăn thừa",cat:"organic"},
-  {id:6,name:"Giấy",cat:"recycle"}
+  { id:1, name:"Vỏ chuối",     cat:"organic",   text:"Lorem ipsum dolor sit amet, item 1 text." },
+  { id:2, name:"Lon nhôm",     cat:"recycle",   text:"Consectetur adipiscing elit, item 2 text." },
+  { id:3, name:"Túi ni lông",  cat:"inorganic", text:"Sed do eiusmod tempor incididunt, item 3 text." },
+  { id:4, name:"Chai nhựa",    cat:"recycle",   text:"Ut enim ad minim veniam, item 4 text." },
+  { id:5, name:"Thức ăn thừa", cat:"organic",   text:"Quis nostrud exercitation ullamco, item 5 text." },
+  { id:6, name:"Giấy",         cat:"recycle",   text:"Duis aute irure dolor in reprehenderit, item 6 text." }
 ];
 
 /* STATE */
-let score = parseInt(localStorage.getItem("saola_arcade_score") || "0",10);
-let remaining = []; // items left
-const itemsEl = document.getElementById("items");
-const bins = Array.from(document.querySelectorAll(".bin"));
+let remaining = [...ITEMS];
+let score = parseInt(localStorage.getItem("saola_arcade_score") || "0");
+let currentItem = null;
+let timer = 15;
+let timerInterval = null;
+
+/* ELEMENTS */
+const itemNameEl = document.getElementById("itemName");
+const timerEl = document.getElementById("timer");
 const scoreEl = document.getElementById("score");
 const popup = document.getElementById("popup");
 const popupText = document.getElementById("popupText");
-const popupImg = document.getElementById("popupImg");
-const endPopup = document.getElementById("endPopup");
-const endForm  = document.getElementById("endForm");
-const playAgainBtn = document.getElementById("playAgainBtn");
-const playerNameInput = document.getElementById("playerName");
-const playerMessageInput = document.getElementById("playerMessage");
+const btnNext = document.getElementById("popupNext");
+const binButtons = document.querySelectorAll(".binBtn");
 
+const endPopup = document.getElementById("endPopup");
+const endContinue = document.getElementById("endContinue");
 
 scoreEl.innerText = score;
 
-/* Utilities: shuffle */
-function shuffle(a){
-  for(let i=a.length-1;i>0;i--){
-    let j=Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
+/* Load next item */
+function nextItem() {
+  if (remaining.length === 0) {
+    // Show final-end popup INSTEAD of redirect
+    endPopup.style.display = "block";
+    return;
   }
-  return a;
+
+  currentItem = remaining.shift();
+  itemNameEl.innerText = currentItem.name;
+
+  resetTimer();
 }
 
-/* Render items */
-function renderItems(){
-  itemsEl.innerHTML="";
-  remaining.forEach(it=>{
-    const d = document.createElement("div");
-    d.className="item";
-    d.draggable = true;
-    d.textContent = it.name;
-    d.dataset.cat = it.cat;
-    d.dataset.id = it.id;
-    itemsEl.appendChild(d);
-    bindDrag(d);
-  });
-}
+/* Timer */
+function resetTimer() {
+  clearInterval(timerInterval);
+  timer = 15;
+  timerEl.innerText = timer;
 
-/* Drag & drop handlers */
-function bindDrag(el){
-  /* --- Desktop native drag --- */
-  el.addEventListener('dragstart', e=>{
-    // prevent accidental image ghost drag on touch devices
-    try { e.dataTransfer.setData("text/plain", el.dataset.id); } catch(err){}
-    el.classList.add("dragging");
-  });
-  el.addEventListener('dragend', ()=> el.classList.remove("dragging"));
+  timerInterval = setInterval(() => {
+    timer--;
+    timerEl.innerText = timer;
 
-  /* --- Pointer fallback for touch / mouse (more reliable) --- */
-  let pointerDown=false, startX=0, startY=0, lastDx=0, lastDy=0;
-  // pointerdown
-  el.addEventListener('pointerdown', e=>{
-    // prevent native dragstart and text selection
-    e.preventDefault();
-    pointerDown=true;
-    startX=e.clientX;
-    startY=e.clientY;
-    lastDx = 0; lastDy = 0;
-    // capture pointer so we continue to receive events even if pointer leaves element
-    try { el.setPointerCapture(e.pointerId); } catch(err){}
-    // styling for dragging
-    el.style.position='relative';
-    el.style.zIndex = 1000;
-    el.classList.add('dragging');
-  });
-
-  // pointermove
-  el.addEventListener('pointermove', e=>{
-    if(!pointerDown) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    lastDx = dx; lastDy = dy;
-    // use transform to move visually (fast)
-    el.style.transform = `translate(${dx}px,${dy}px)`;
-  });
-
-  // pointerup / pointercancel
-  const endPointer = (e) => {
-    if(!pointerDown) return;
-    pointerDown=false;
-    // compute collision WHILE transform still applied (so rect reflects actual visual pos)
-    const rect = el.getBoundingClientRect();
-    const centerX = rect.left + rect.width/2;
-    const centerY = rect.top + rect.height/2;
-    let droppedBin = null;
-    bins.forEach(bin=>{
-      const r = bin.getBoundingClientRect();
-      if(centerX >= r.left && centerX <= r.right && centerY >= r.top && centerY <= r.bottom){
-        droppedBin = bin;
-      }
-    });
-
-    // release pointer capture if available
-    try { if(e && e.pointerId) el.releasePointerCapture(e.pointerId); } catch(err){}
-
-    // reset visual styles AFTER computing rect
-    el.style.transform='';
-    el.style.position='static';
-    el.style.zIndex='';
-    el.classList.remove('dragging');
-
-    if(droppedBin){
-      handleDrop(el.dataset.id, droppedBin);
-    } else {
-      // no drop -> just snap back (we already reset transform)
+    if (timer <= 0) {
+      clearInterval(timerInterval);
+      showWrongFlash();
     }
-  };
-
-  el.addEventListener('pointerup', endPointer);
-  el.addEventListener('pointercancel', endPointer);
+  }, 1000);
 }
 
-/* Desktop drag & drop (bins) */
-bins.forEach(bin=>{
-  bin.addEventListener('dragover', e=>{ e.preventDefault(); bin.classList.add("highlight"); });
-  bin.addEventListener('dragleave', ()=> bin.classList.remove("highlight"));
-  bin.addEventListener('drop', e=>{
-    e.preventDefault();
-    bin.classList.remove("highlight");
-    const id = e.dataTransfer.getData("text/plain");
-    handleDrop(id, bin);
+/* Wrong answer flash */
+function showWrongFlash() {
+  document.body.style.background = "#ffb0b0";
+  setTimeout(() => {
+    document.body.style.background = "";
+  }, 300);
+}
+
+/* User chooses a bin */
+binButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    if (btn.dataset.cat === currentItem.cat) {
+      // correct
+      clearInterval(timerInterval);
+      score += 100;
+      localStorage.setItem("saola_arcade_score", score);
+      scoreEl.innerText = score;
+
+      popupText.innerText = currentItem.text;
+      popup.style.display = "block";
+
+    } else {
+      // wrong → flash red
+      btn.style.background = "#ff4d4d";
+      setTimeout(() => {
+        btn.style.background = "";
+      }, 300);
+      showWrongFlash();
+    }
   });
 });
 
-/* Drop logic */
-function handleDrop(id, bin){
-  const itemIndex = remaining.findIndex(i=>String(i.id) === String(id));
-  if(itemIndex === -1) return;
-  const item = remaining[itemIndex];
-  const binCat = bin.dataset.cat;
-  if(item.cat === binCat){
-    score += 100;
-    localStorage.setItem("saola_arcade_score", String(score));
-    scoreEl.innerText = score;
+/* Popup → next question */
+btnNext.addEventListener("click", () => {
+  popup.style.display = "none";
+  nextItem();
+});
 
-    popupImg.style.display='none';
-    popupText.innerText = `${item.name} is ${bin.textContent}. +100 điểm!`;
-    popup.style.display='block';
-
-    remaining.splice(itemIndex,1);
-    renderItems();
-  } else {
-    // visual feedback for wrong bin
-    if (bin.animate) {
-      bin.animate([{background:'#fff'},{background:'#ffdcdc'},{background:'#fff'}],{duration:400});
-    } else {
-      // fallback: briefly add a class (if CSS exists)
-      bin.classList.add('wrong');
-      setTimeout(()=>bin.classList.remove('wrong'), 400);
-    }
-  }
-}
-
-/* Popup close */
-document.getElementById("popupClose").addEventListener("click", () => {
-  popup.style.display = 'none';
+/* END POPUP → Final Page */
+endContinue.addEventListener("click", () => {
+  window.location.href = "final.html";
 });
 
 /* INIT */
-function init(){
-  remaining = shuffle(ITEMS.slice());
-  renderItems();
-}
-init();
-
-
-
-
-
+nextItem();
