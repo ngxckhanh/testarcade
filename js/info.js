@@ -1,28 +1,43 @@
 const nameInput = document.getElementById("nameInput");
 const classInput = document.getElementById("classInput");
 const emailInput = document.getElementById("emailInput");
-const startBtn = document.getElementById("startBtn");
 const errorMsg = document.getElementById("errorMsg");
+const startBtn = document.getElementById("startBtn");
 
-/* Enable button only if fields are valid */
+// Email pattern for Gmail
+const gmailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
 function validate() {
-    if (nameInput.value.trim() && classInput.value.trim() && emailInput.value.trim()) {
-        startBtn.disabled = false;
-        errorMsg.textContent = "";
-    } else {
+    const name = nameInput.value.trim();
+    const clas = classInput.value.trim();
+    const email = emailInput.value.trim();
+
+    if (!name || !clas || !email) {
+        errorMsg.innerText = "Please fill in all fields.";
         startBtn.disabled = true;
+        return;
     }
+
+    if (!gmailPattern.test(email)) {
+        errorMsg.innerText = "Email must be a valid @gmail.com address.";
+        startBtn.disabled = true;
+        return;
+    }
+
+    errorMsg.innerText = "";
+    startBtn.disabled = false;
 }
 
+// Validate whenever input changes
 nameInput.addEventListener("input", validate);
 classInput.addEventListener("input", validate);
 emailInput.addEventListener("input", validate);
 
-/* Save info + go to game */
+// Save to localStorage and go to sorting.html
 startBtn.addEventListener("click", () => {
-    localStorage.setItem("saola_user_name", nameInput.value.trim());
-    localStorage.setItem("saola_user_class", classInput.value.trim());
-    localStorage.setItem("saola_user_email", emailInput.value.trim());
+    localStorage.setItem("player_name", nameInput.value.trim());
+    localStorage.setItem("player_class", classInput.value.trim());
+    localStorage.setItem("player_email", emailInput.value.trim());
 
     window.location.href = "sorting-game.html";
 });
