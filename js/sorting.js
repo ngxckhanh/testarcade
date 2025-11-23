@@ -9,8 +9,10 @@ const ITEMS = [
 ];
 
 /* STATE */
-let remaining = [...ITEMS];
-let score = parseInt(localStorage.getItem("saola_arcade_score") || "0");
+let remaining = ITEMS.map(item => ({ ...item, attempts: 0 }));
+let score = 0; // Always start at 0
+localStorage.setItem("saola_arcade_score", "0");
+
 let currentItem = null;
 let timer = 15;
 let timerInterval = null;
@@ -29,10 +31,9 @@ const endContinue = document.getElementById("endContinue");
 
 scoreEl.innerText = score;
 
-/* Load next item */
+/* LOAD NEXT ITEM */
 function nextItem() {
   if (remaining.length === 0) {
-    // Show final-end popup INSTEAD of redirect
     endPopup.style.display = "block";
     return;
   }
@@ -43,7 +44,7 @@ function nextItem() {
   resetTimer();
 }
 
-/* Timer */
+/* TIMER */
 function resetTimer() {
   clearInterval(timerInterval);
   timer = 15;
@@ -60,7 +61,7 @@ function resetTimer() {
   }, 1000);
 }
 
-/* Wrong answer flash */
+/* WRONG ANSWER FLASH */
 function showWrongFlash() {
   document.body.style.background = "#ffb0b0";
   setTimeout(() => {
@@ -68,14 +69,18 @@ function showWrongFlash() {
   }, 300);
 }
 
-/* User chooses a bin */
+/* USER CHOOSES BIN */
 binButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-
     if (btn.dataset.cat === currentItem.cat) {
-      // correct
-      clearInterval(timerInterval);
-      score += 100;
+      // CORRECT
+      clearInterval(timerInterval); // pause timer
+
+      if (currentItem.attempts === 0) {
+        score += 100;
+        if (score > 600) score = 600;
+      }
+
       localStorage.setItem("saola_arcade_score", score);
       scoreEl.innerText = score;
 
@@ -83,23 +88,24 @@ binButtons.forEach(btn => {
       popup.style.display = "block";
 
     } else {
-      // wrong → flash red
+      // WRONG → flash red and put question back at end
       btn.style.background = "#ff4d4d";
-      setTimeout(() => {
-        btn.style.background = "";
-      }, 300);
+      setTimeout(() => { btn.style.background = ""; }, 300);
       showWrongFlash();
+
+      currentItem.attempts = 1;
+      remaining.push(currentItem); // return to end
     }
   });
 });
 
-/* Popup → next question */
+/* POPUP → NEXT QUESTION */
 btnNext.addEventListener("click", () => {
   popup.style.display = "none";
   nextItem();
 });
 
-/* END POPUP → Final Page */
+/* END POPUP → FINAL PAGE */
 endContinue.addEventListener("click", () => {
   window.location.href = "final.html";
 });
