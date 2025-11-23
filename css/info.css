@@ -1,43 +1,69 @@
-const nameInput = document.getElementById("nameInput");
-const classInput = document.getElementById("classInput");
-const emailInput = document.getElementById("emailInput");
-const errorMsg = document.getElementById("errorMsg");
-const startBtn = document.getElementById("startBtn");
-
-// Email pattern for Gmail
-const gmailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-
-function validate() {
-    const name = nameInput.value.trim();
-    const clas = classInput.value.trim();
-    const email = emailInput.value.trim();
-
-    if (!name || !clas || !email) {
-        errorMsg.innerText = "Please fill in all fields.";
-        startBtn.disabled = true;
-        return;
-    }
-
-    if (!gmailPattern.test(email)) {
-        errorMsg.innerText = "Email must be a valid @gmail.com address.";
-        startBtn.disabled = true;
-        return;
-    }
-
-    errorMsg.innerText = "";
-    startBtn.disabled = false;
+body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    color: #00ff99;
+    font-family: "Press Start 2P", cursive;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
 }
 
-// Validate whenever input changes
-nameInput.addEventListener("input", validate);
-classInput.addEventListener("input", validate);
-emailInput.addEventListener("input", validate);
+.container {
+    width: 90%;
+    max-width: 400px;
+    animation: fadeIn 1s ease-in-out;
+}
 
-// Save to localStorage and go to sorting.html
-startBtn.addEventListener("click", () => {
-    localStorage.setItem("player_name", nameInput.value.trim());
-    localStorage.setItem("player_class", classInput.value.trim());
-    localStorage.setItem("player_email", emailInput.value.trim());
+.title {
+    font-size: 20px;
+    margin-bottom: 25px;
+}
 
-    window.location.href = "sorting-game.html";
-});
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.start-btn {
+    margin-top: 15px;
+    padding: 15px;
+    background: #00ff99;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.start-btn:disabled {
+    background: #444;
+    cursor: not-allowed;
+}
+
+.start-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+.error {
+    color: #ff6666;
+    font-size: 12px;
+    min-height: 16px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
