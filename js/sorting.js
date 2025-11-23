@@ -9,8 +9,8 @@ const ITEMS = [
 ];
 
 /* STATE */
-let remaining = ITEMS.map(item => ({ ...item, attempts: 0 }));
-let score = 0; // Always start at 0
+let remaining = [...ITEMS];
+let score = 0;
 localStorage.setItem("saola_arcade_score", "0");
 
 let currentItem = null;
@@ -31,7 +31,7 @@ const endContinue = document.getElementById("endContinue");
 
 scoreEl.innerText = score;
 
-/* LOAD NEXT ITEM */
+/* START NEXT ITEM */
 function nextItem() {
   if (remaining.length === 0) {
     endPopup.style.display = "block";
@@ -41,13 +41,12 @@ function nextItem() {
   currentItem = remaining.shift();
   itemNameEl.innerText = currentItem.name;
 
-  resetTimer();
+  startTimer(); // resume or start timer for current item
 }
 
-/* TIMER */
-function resetTimer() {
+/* TIMER FUNCTION */
+function startTimer() {
   clearInterval(timerInterval);
-  timer = 15;
   timerEl.innerText = timer;
 
   timerInterval = setInterval(() => {
@@ -56,7 +55,8 @@ function resetTimer() {
 
     if (timer <= 0) {
       clearInterval(timerInterval);
-      showWrongFlash();
+      // Time's up → directly show final popup
+      endPopup.style.display = "block";
     }
   }, 1000);
 }
@@ -64,23 +64,18 @@ function resetTimer() {
 /* WRONG ANSWER FLASH */
 function showWrongFlash() {
   document.body.style.background = "#ffb0b0";
-  setTimeout(() => {
-    document.body.style.background = "";
-  }, 300);
+  setTimeout(() => { document.body.style.background = ""; }, 300);
 }
 
-/* USER CHOOSES BIN */
+/* USER SELECTS BIN */
 binButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     if (btn.dataset.cat === currentItem.cat) {
-      // CORRECT
+      // CORRECT ANSWER
       clearInterval(timerInterval); // pause timer
 
-      if (currentItem.attempts === 0) {
-        score += 100;
-        if (score > 600) score = 600;
-      }
-
+      score += 100;
+      if (score > 600) score = 600;
       localStorage.setItem("saola_arcade_score", score);
       scoreEl.innerText = score;
 
@@ -88,13 +83,10 @@ binButtons.forEach(btn => {
       popup.style.display = "block";
 
     } else {
-      // WRONG → flash red and put question back at end
+      // WRONG → flash red
       btn.style.background = "#ff4d4d";
       setTimeout(() => { btn.style.background = ""; }, 300);
       showWrongFlash();
-
-      currentItem.attempts = 1;
-      remaining.push(currentItem); // return to end
     }
   });
 });
@@ -102,6 +94,7 @@ binButtons.forEach(btn => {
 /* POPUP → NEXT QUESTION */
 btnNext.addEventListener("click", () => {
   popup.style.display = "none";
+  startTimer(); // resume timer from remaining seconds
   nextItem();
 });
 
