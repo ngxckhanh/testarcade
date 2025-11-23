@@ -3,58 +3,42 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sorting — Drag & Drop</title>
-  <!-- Link external CSS -->
+  <title>Sorting Quiz — Sao La Arcade</title>
+
   <link rel="stylesheet" href="css/sorting.css">
 </head>
-<body>
-  <div class="wrap">
-    <h1>Phân Loại Rác — Kéo & Thả</h1>
-
-    <div id="board">
-      <div id="items">
-        <!-- Items will be injected dynamically -->
-      </div>
-
-      <div id="bins">
-        <div class="bin" data-cat="organic">Hữu cơ</div>
-        <div class="bin" data-cat="recycle">Tái chế</div>
-        <div class="bin" data-cat="inorganic">Vô cơ</div>
-      </div>
-    </div>
-
-    <div class="controls">
-      <div class="scoreRow">Điểm hiện tại: <span id="score">0</span></div>
-    </div>
-  </div>
-
-  <!-- Popup that shows after each correct answer -->
-  <div class="popup" id="popup">
-    <img src="" alt="info" id="popupImg" style="display:none">
-    <div id="popupText">Thông tin về loại rác — thay bằng text khi cần.</div>
-    <div style="text-align:center;margin-top:10px;">
-      <button class="btn" id="popupClose">Tiếp tục</button>
-    </div>
-  </div>
-
-  <!-- Link external JS -->
-  <script src="js/sorting.js"></script>
   <!-- POPUP CUỐI GAME -->
-
 <div id="endPopup" class="end-popup" style="display:none;">
   <div class="end-popup-box">
     <h2>🎉 Bạn đã hoàn thành trò chơi!</h2>
-    
-</form>
+    <p>Bạn đã xử lý toàn bộ rác đúng cách! Nhấn tiếp tục để xem kết quả.</p>
 
+    <button id="endContinue" class="btn">Tiếp tục</button>
   </div>
 </div>
+<body>
 
+  <h1 class="arcade-title">SAO LA ARCADE</h1>
+
+  <div class="wrap">
+    <h2 id="itemName">Loading...</h2>
+    <div id="timer">15</div>
+
+    <div id="buttons">
+      <button class="binBtn" data-cat="organic">Hữu cơ</button>
+      <button class="binBtn" data-cat="recycle">Tái chế</button>
+      <button class="binBtn" data-cat="inorganic">Vô cơ</button>
+    </div>
+
+    <div class="scoreRow">Điểm: <span id="score">0</span></div>
+  </div>
+
+  <!-- Popup -->
+  <div class="popup" id="popup">
+    <div id="popupText">Lorem ipsum.</div>
+    <button id="popupNext" class="btn">Tiếp tục</button>
+  </div>
+
+  <script src="js/sorting.js"></script>
 </body>
 </html>
-
-
-
-
-
-
