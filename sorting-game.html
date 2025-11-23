@@ -4,18 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Sorting Quiz — Sao La Arcade</title>
-
   <link rel="stylesheet" href="css/sorting.css">
 </head>
-  <!-- POPUP CUỐI GAME -->
-<div id="endPopup" class="end-popup" style="display:none;">
-  <div class="end-popup-box">
-    <h2>🎉 Bạn đã hoàn thành trò chơi!</h2>
-    <p>Bạn đã xử lý toàn bộ rác đúng cách! Nhấn tiếp tục để xem kết quả.</p>
-
-    <button id="endContinue" class="btn">Tiếp tục</button>
-  </div>
-</div>
 <body>
 
   <h1 class="arcade-title">SAO LA ARCADE</h1>
@@ -33,10 +23,19 @@
     <div class="scoreRow">Điểm: <span id="score">0</span></div>
   </div>
 
-  <!-- Popup -->
+  <!-- Correct answer popup -->
   <div class="popup" id="popup">
     <div id="popupText">Lorem ipsum.</div>
     <button id="popupNext" class="btn">Tiếp tục</button>
+  </div>
+
+  <!-- End game popup -->
+  <div id="endPopup" class="end-popup" style="display:none;">
+    <div class="end-popup-box">
+      <h2>🎉 Bạn đã hoàn thành trò chơi!</h2>
+      <p>Bạn đã xử lý toàn bộ rác đúng cách! Nhấn tiếp tục để xem kết quả.</p>
+      <button id="endContinue" class="btn">Tiếp tục</button>
+    </div>
   </div>
 
   <script src="js/sorting.js"></script>
